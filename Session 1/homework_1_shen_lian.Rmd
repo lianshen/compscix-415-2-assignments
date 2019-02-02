@@ -8,7 +8,7 @@ date: 2/1/2019
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+***
 My Github repository for my assignments can be found at this URL: https://github.com/lianshen/compscix-415-2-assignments  
 
 ***
@@ -17,8 +17,8 @@ library(mdsr)
 library(tidyverse)
 data("WorldCities")
 ```
-
-Question 1: There are 23,018 observations and 10 variables. Some of the variables are called name, latitude, longitude, counter, and population.
+***
+**Question 1**: There are 23,018 observations and 10 variables. Some of the variables are called name, latitude, longitude, counter, and population.
 
 ```{r world_cities}
 glimpse(WorldCities)
@@ -27,8 +27,30 @@ country_col <- WorldCities$country
 unique(country_col)
 ```
 ***
-Question 2:
+**Question 2**: There is a column called region in the data set. Can you extract this and show
+only the unique values?
+
 ```{r region_column}
 region_col <- WorldCities$region
 unique(region_col)
+```
+***
+**Question 3**: Can you extract and show the unique entries from the country column in
+WorldCities using one line of code and two %>% operators?
+
+```{r unique_country}
+WorldCities %>% select(country) %>% unique()
+```
+***
+Visualization Demo  
+```{r demo_visualize}
+WorldCities %>% ggplot(aes(x = population)) + geom_histogram()
+```
+
+***
+**Question 4**: Make one more histogram of the population and add a new x-label, a new ylabel,
+a new title (use ggtitle('my title')), and change the theme of the plot using theme_bw().
+
+```{r world_cities_visualization}
+WorldCities %>% ggplot(aes(x = population)) + geom_histogram() + xlab('City Population') + ylab('Number of Cities') + ggtitle('Population of World Cities Histogram') + theme_bw()
 ```
