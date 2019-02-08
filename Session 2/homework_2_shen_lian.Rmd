@@ -47,7 +47,7 @@ mpgPlot + geom_point(aes(x = cyl, y = hwy))
 ```{r}
 mpgPlot + geom_point(aes(x = class, y = drv))
 ```
-Plotting class vs drv does not show any trend between the two variables because both of them are categorical.
+Plotting class vs drv as a scatter does not show any trend between the two variables because both of them are discrete and categorical.
 
 ***
 ##**3.3.1 Exercises**
@@ -172,4 +172,32 @@ mpgPlot + geom_point(aes(color = drv), shape = 21, size = 5, color = "white", st
 `geom_bar` is used to report the frequency of the variable chosen (only needs x variable); therefore the height of the bars vary proportionally to the different groups of the x variable.
 
 ***
+##**What is a Data Scientist data graphics analysis.**
+**Link to data graphics: https://static.guim.co.uk/sys-images/Guardian/Pix/pictures/2012/3/2/1330695817953/EMC2-graphic-on-data-scie-008.jpg **
+
+The first noticeable issue is the chosen color scheme. Using shades of blue and gray can be difficult to distinguish. This can be improved by using a more primary color scheme instead.
+
+The first visualization for: **Over the next five years, demand for data scientists will...**
+uses a circle graph, which is hard to compare values because each value is relative to the previous value. The position of the dataset is dependent on the position of the adjacent set. It would be better to use an absolute position to compare each dataset (a bar graph would solve this). Another issue with using the circle graph is having to read the description of each dataset in no particular order. Using a bar graph can order the datasets, making it easier to read. From left to right: Significantly less, less than, met, somewhat outpace, significantly outpace.
+A good feature about the graph is the value labels are clear which compensates for the relative positioning of the circle graph datasets.
+
+The second visualization about **the best source of data science talent** uses area graphs, when it could have just used a simple bar graph to make it easier to read.
+
+The third visualization for: **The biggest obstacle to data science adoption in our organization is:**
+could have used a bar graph as well, rather than using lighter shades to represent lower percentage votes in the survey.
+
+The fourth visualization for **comparing degrees between data scientists and business intelligence professionals** is difficult to understand at first glance. Since the visualizations are split by degree, does each percentage represent part of the whole for all data scientists vs BI professionals? If so, they should be combined into one graph, sharing the same y-axis scale. Another misleading feature is for the earlier degrees, it looks like less data scientists received, for example, high school degrees than degrees BI professionals received. This isn't what the visualization was trying to represent. Instead, from left to right, the percentages should be cascading downwards: people who received masters degrees also received college graduate, some college, and high school. Instead of reporting just the percentage of high school degrees for data scientists and BI professionals, the data should have been inclusive of any dependent degrees.
+OR the question could have been phrased: What was the highest degree obtained? In that case, the graph would make slightly more sense.
+
+The fifth visualization about **comparing background studies of data scientists vs BI professionals** uses the area of circles to represent each study type. A bar graph would have been sufficient and easier to read and on the same y-axis scale for comparison purposes. It is much harder to use areas to compare instead of length of bars to compare.
+
+The sixth visualization about **thoughts on new technology creating demand** uses a circle graph, which is okay in this case since it is only comparing two values. The color scheme could use improvement though since the shades of blue are not contrasting enough.
+
+The seventh visualization about **the characteristics of data scientists** is extremely hard to understand. It lists the characteristics of big data vs. normal data science (maybe the answer options it offered in the survey), but understanding how that translates to the graph below took some inference. Depending on what the user chose, they would lean more towards big data or more towards normal data. The graph could have plotted the frequency of the votes for each comparison category. Each of the five classes could have two bars representing the vote count.
+
+The eighth visualization about the **data lifecycle** is okay, but the colors representing BI and Data Scientists *switched* which could be very misleading.
+
+The last visualization about **who data scientists work with** is probably one of the worst graphs in the report. It might as well have used a table to report the numbers because each block reports a different number, but the area/bar length is the same for each team. The color scale doesn't seem to trend with the values either. A bar graph representation would have been the easiest way to fix all problems about this visualization.
+
+
 
