@@ -1,0 +1,10 @@
+---
+title: "COMPSCIX 415.2 Homework 3"
+author: "Lian Shen"
+date: "February 12, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
