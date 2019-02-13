@@ -68,7 +68,11 @@ You can see this information by running `mpg` where the third row of the table s
 ***
 **3. Map a continuous variable to `color`, `size`, and `shape`. How do these aesthetics behave differently for categorical vs. continuous variables?**
 ```{r}
-mpgPlot + geom_point(aes(x = displ, y = hwy, color = hwy, size = cyl))
+mpgPlot + geom_point(aes(x = displ, y = hwy, color = cyl))
+mpgPlot + geom_point(aes(x = displ, y = hwy, size = cyl))
+mpgPlot + geom_point(aes(x = displ, y = hwy, color = drv))
+mpgPlot + geom_point(aes(x = displ, y = hwy, size = drv))
+mpgPlot + geom_point(aes(x = displ, y = hwy, shape = drv))
 ```
 `shape` cannot be mapped to a continuous variable because of the limited number of shapes, but mapping `color` and `size` to a continuous variable creates a gradient for `color` and bins markers for `size`.
 
@@ -87,7 +91,7 @@ If x and y are mapped to the same variable, the slope of the plot will be 1 with
 mpgPlot + geom_point(aes(x = displ, y = hwy), shape = 23, stroke = 1)
 mpgPlot + geom_point(aes(x = displ, y = hwy), shape = 23, stroke = 2)
 ```
-The `stroke` aesthetic changes the width of the shape border (thickness) if the shape has a border (like 21, 22, 23, 24, and 25).
+The `stroke` aesthetic changes the width of the shape border (thickness) if the shape has a border (like 21, 22, 23, 24, and 25).  
 
 ***
 **6. What happens if you map an aesthetic to something other than a variable name, like `aes(colour = displ < 5)`? Note, you’ll also need to specify x and y.**
