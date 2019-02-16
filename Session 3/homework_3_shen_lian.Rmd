@@ -20,7 +20,7 @@ ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + geom_point()
 ```
 
 
-This plot only shows a subset of the datapoints because of the discrete nature of the dataset. There are datapoints overlapping with each other. The code below should show all datapoints.
+This plot only shows a subset of the datapoints because of the discrete nature of the dataset. There are datapoints overlapping with each other. The code below should show more datapoints.
 
 ```{r}
 ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + geom_point(position = "jitter")
@@ -29,7 +29,7 @@ ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + geom_point(position = "jit
 ***
 ####**2. What parameters to `geom_jitter()` control the amount of jittering?**
 
-The `width` and `height` parameters adjust the vertical and horizontal amount of jitter/randomness.
+The `width` and `height` parameters adjust the horizontal and vertical amount of jitter/randomness, respectively.
 
 ***
 ####**3. Compare and contrast `geom_jitter()` with `geom_count()`.**
@@ -40,7 +40,7 @@ mpgPlot + geom_jitter()
 mpgPlot + geom_count()
 ```
 
-`geom_jitter()` is a shortcut for `geom_point(position = "jitter")` for adding randomization to the location of each point. `geom_count()` is similar to `geom_point()` where each point's area reflects the number of observations of the location. Both geoms are useful for discretizing data where overlapping points may be an issue.
+`geom_jitter()` is a shortcut for `geom_point(position = "jitter")` for adding randomization to the location of each point. `geom_count()` is an extension to `geom_point()` where each point's area reflects the number of observations of the location. Both geoms are useful for discretizing data where overlapping points may be an issue.
 
 ***
 ####**4. What’s the default position adjustment for `geom_boxplot()`? Create a visualisation of the `mpg` dataset that demonstrates it.**
@@ -60,7 +60,7 @@ ggplot(data = mpg, mapping = aes(x = class, y = hwy)) + geom_boxplot()
 ```{r}
 ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) + geom_point() + geom_abline() + coord_fixed()
 ```
-The plot shows a linear trend between city and highway. `coord_fixed()` fixes the cartesion coordinate plot's aspect ratio to 1 so that one unit of the x-axis is the same as one unit on the y-axis. `coord_fixed()` is important for adjusting the aspect ratio to whatever is desired and is a good way to keep individual plots' aspect ratios consistent.  
+The plot shows a linear trend between city and highway. `coord_fixed()` fixes the cartesion coordinate plot's aspect ratio to 1 by default so that one unit of the x-axis is the same as one unit on the y-axis. `coord_fixed()` is important for adjusting the aspect ratio to whatever is desired and is a good way to keep individual plots' aspect ratios consistent with each other.  
 `geom_abline()` plots a diagonal reference line where the intercept and slope can be set. 
 
 ***
@@ -70,7 +70,7 @@ The plot shows a linear trend between city and highway. `coord_fixed()` fixes th
 **`my_varıable`**  
 **`#> Error in eval(expr, envir, enclos): object 'my_varıable' not found`**  
 
-`my_varıable` does not exist and has no value assigned to it. One character is off. The variable that was set is called `my_variable`.
+`my_varıable` does not exist and has no value assigned to it. One character (ı) is off and should be 'i'. The variable that was set is called `my_variable`.
 
 ***
 ####**2. Tweak each of the following R commands so that they run correctly:**
@@ -93,40 +93,48 @@ The plot shows a linear trend between city and highway. `coord_fixed()` fixes th
 library(nycflights13)
 ```
 
-**1. Had an arrival delay of two or more hours**  
+*1. Had an arrival delay of two or more hours*   
 ```{r}
 flights %>% filter(arr_delay >= 120)
 ```
 
-**2. Flew to Houston (IAH or HOU)**  
+*2. Flew to Houston (IAH or HOU)*  
 ```{r}
-flights %>% filter(dest == 'IAH' | dest == 'HOU')
+flights %>% filter(dest %in% c('IAH','HOU'))
 ```
 
-**3. Were operated by United, American, or Delta**  
+*3. Were operated by United, American, or Delta*  
 ```{r}
 airlines
-flights %>% filter(carrier == 'AA' | carrier == 'DL' | carrier == 'UA')
+flights %>% filter(carrier %in% c('AA','DL','UA'))
 ```
 
-**4. Departed in summer (July, August, and September)**  
+*4. Departed in summer (July, August, and September)*  
 ```{r}
-flights %>% filter(month == 7 | month == 8 | month == 9)
+flights %>% filter(month %in% c(7,8,9))
 ```
 
-**5. Arrived more than two hours late, but didn’t leave late**  
+*5. Arrived more than two hours late, but didn’t leave late*  
 ```{r}
 flights %>% filter(arr_delay > 120 & dep_delay <= 0)
 ```
 
-**6. Were delayed by at least an hour, but made up over 30 minutes in flight**  
+*6. Were delayed by at least an hour, but made up over 30 minutes in flight*  
+
+If "made up over 30 minutes in flight" means saved over 30 minutes from the scheduled flight time:  
 ```{r}
 mutatedFlights <- flights %>% mutate(sched_flight_duration = sched_arr_time - sched_dep_time, actual_flight_duration = arr_time - dep_time)
 mutatedFlights <- mutatedFlights %>% mutate(made_up_time = sched_flight_duration - actual_flight_duration)
 mutatedFlights %>% filter(dep_delay >= 60 & made_up_time > 30)
 ```
 
-**7. Departed between midnight and 6am (inclusive)**  
+If "made up over 30 minutes in flight" means the arrival delay was more than 30 minutes less than the departure delay:  
+```{r}
+flights %>% filter(dep_delay >= 60 & arr_delay < dep_delay - 30)
+```
+
+
+*7. Departed between midnight and 6am (inclusive)*  
 ```{r}
 flights %>% filter(dep_time >= 0 & dep_time <= 600)
 ```
@@ -142,13 +150,39 @@ There are 8,255 flights that are missing depature times. Of these records, `dep_
 ***
 ####**4. Why is NA ^ 0 not missing? Why is NA | TRUE not missing? Why is FALSE & NA not missing? Can you figure out the general rule? (NA * 0 is a tricky counterexample!)**
 
+`NA ^ 0` returns 1 because `NA` acts as a placeholder number (could be `Inf`, `0`,). Replacing `NA` with any number (including `Inf`) and raising it to the power of 0 will always return 1. However, `NA * 0` returns `NA` because there are cases where a number multiplied by 0 is indeterminate. Since `NA` could represent `Inf`, `Inf * 0` is indeterminate, so `NA * 0` will return `NA`.  
+`NA | TRUE` returns `TRUE` because the logical *OR* operator will return `TRUE` if any argument is `TRUE`. However, if `NA | FALSE` was executed, the result would be `NA` because `NA` could represent `TRUE` or `FALSE`. If `NA` represented `FALSE`, the expression would return `FALSE`, but if `NA` represented `TRUE`, the expression would return `TRUE`. Therefore, the expression is indeterminate and returns `NA`.  
+`NA & FALSE` returns `FALSE` because the logical *AND* operator will return `FALSE` if any argument is `FALSE`. `NA` could represent `TRUE` or `FALSE`, but in both scenarios, the expression will always return `FALSE`.  
+The general rule is that if a consistent result can be obtained regardless of whatever value `NA` could represent, the expression will yield that consistent result. If the expression cannot yield a consistent result for what `NA` could represent, the expression will return `NA`.
+
 ***
 ##**5.4.1 Exercises**
 ####**1. Brainstorm as many ways as possible to select dep_time, dep_delay, arr_time, and arr_delay from flights.**
 
+```{r}
+select(flights, dep_time, dep_delay, arr_time, arr_delay) %>% variable.names()
+flights %>% select(dep_time, dep_delay, arr_time, arr_delay) %>% variable.names()
+cols <- c(dep_time = "dep_time", dep_delay = "dep_delay", arr_time = "arr_time", arr_delay = "arr_delay")
+select(flights, !!cols) %>% variable.names()
+flights %>% select (!!cols) %>% variable.names()
+select(flights, starts_with("dep"), starts_with("arr")) %>% variable.names()
+flights %>% select(starts_with("dep"), starts_with("arr")) %>% variable.names()
+select(flights, dep_time:arr_delay, -sched_dep_time, -sched_arr_time) %>% variable.names()
+flights %>% select(dep_time:arr_delay, -sched_dep_time, -sched_arr_time) %>% variable.names()
+select(flights, ends_with("delay"), ends_with("time"), -sched_dep_time, -sched_arr_time, -air_time) %>% variable.names()
+flights %>% select(ends_with("delay"), ends_with("time"), -sched_dep_time, -sched_arr_time, -air_time) %>% variable.names()
+vars <- c("dep_time", "dep_delay", "arr_time", "arr_delay")
+select(flights, one_of(vars)) %>% variable.names()
+flights %>% select(one_of(vars)) %>% variable.names()
+```
+
+`variable.names()` is called for brevity to show that the `select` function returns the correct columns, assuming the data is correct.
+
 ***
 ####**3. What does the one_of() function do? Why might it be helpful in conjunction with this vector?**
 **`vars <- c("year", "month", "day", "dep_delay", "arr_delay")`**
+
+`one_of()` is a helper function for `select` that matches the data's variable names in a character vector argument. If the `select` operation uses `one_of` with the vector, the columns/variables returned are those that match any of the characters of the vector.
 
 ***
 
