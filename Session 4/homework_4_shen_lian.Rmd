@@ -11,6 +11,16 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = 'center')
 ```
+
+```{css, echo=FALSE}
+pre code, pre, code {
+  white-space: pre !important;
+  overflow-x: scroll !important;
+  word-break: keep-all !important;
+  word-wrap: initial !important;
+}
+```
+
 ```{r}
 library(tidyverse)
 library(nycflights13)
@@ -85,16 +95,45 @@ An object is a tibble if `[1] "tbl_df"     "tbl"        "data.frame"` is returne
 **`df$x`**  
 **`df[, "xyz"]`**  
 **`df[, c("abc", "xyz")]`**  
+```{r, echo=FALSE}
+df <- data.frame(abc = 1, xyz = "a")
+```
+```{r}
+df_tibble <- as_tibble(df)
+df$x
+df_tibble$x
+df[, "xyz"]
+df_tibble[, "xyz"]
+df[, c("abc", "xyz")]
+df_tibble[, c("abc", "xyz")]
+```
 
+Tibbles are more strict than data frames and provide better formatting. The code `df$x` shouldn't return anything since there is no variable name `x` in the data frame `df`, but it still returns the value `a` since its existing variable name `xyz` was a partial match. Extracting by a variable name that doesn't exist in a tibble will return `NULL`, which is expected behavior since the variable doesn't exist.
 
+`[, "xyz"]` returns all rows of variable "xyz". However, the behavior for data frames isn't expected; it returns the rows as an array and specifies each value as a "level". The output format makes it difficult to understand. Calling this code with a tibble returns something more readable: the values separated by rows as a table, not an array.
+
+Specifying more than one variable in `[, c("abc","xyz")]` will force a data frame to return a table instead of an array. In this case, the output for a data frame and a tibble are similar, but the tibble will show the data type of each variable.
 
 ***
 ###**3.**
 **If you have the name of a variable stored in an object, e.g. `var <- "mpg"`, how can you extract the reference variable from a tibble?**
 
+```{r}
+my_tibble <- tibble(col1 = c(1,3,5), mpg = c(25,30,27))
+var <- "mpg"
+#doesn't work
+my_tibble$var #have to use my_tibble$mpg
+#works
+my_tibble[[var]]
+my_tibble[var]
+my_tibble[,var]
+```
+
 ***
 ###**6.**
 **What option controls how many additional column names are printed at the footer of a tibble?**
+
+Printing a tibble is designed to not overwhelm the console if the dataset is large. By default, it will print the first 10 rows and the columns that fit on the screen. To change how many additional columns to print, this can be set in the `print` command's parameter `width`. Setting `width` to `Inf` will print all columns. To change the default print behavior, set `options` parameter `tibble.width` to change the output width (`Inf` will show all columns). `tibble.max_extra_cols` sets the number of extra columns printed in reduced form.
 
 ***
 ##**12.3.3 Exercises**
@@ -102,6 +141,12 @@ An object is a tibble if `[1] "tbl_df"     "tbl"        "data.frame"` is returne
 **Why does this code fail?**  
 **`table4a %>% gather(1999, 2000, key = "year", value = "cases")`**  
 **`#> Error in inds_combine(.vars, ind_list): Position must be between 0 and n`**  
+
+The code fails because the gathered columns' names are numeric and not strings. To specify the year columns, the character \` must surround the variable names.
+```{r}
+table4a %>% gather(`1999`, `2000`, key = "year", value = "cases")
+```
+
 
 ***
 ###**3.**
@@ -116,6 +161,24 @@ An object is a tibble if `[1] "tbl_df"     "tbl"        "data.frame"` is returne
 **`  "Jessica Cordero", "height",   156`**  
 **`)`**
 
+Since tibble `people` has more observations for "Phillip Woods" than the unique `key` values of the tibble, spreading would not work since the function wouldn't know which identifier `age` to use as the new column and which `age` value to associate the only `height` value to.
+
+```{r}
+people <- tribble(
+  ~name,             ~key,    ~value,     ~datestamp,
+  #-----------------|--------|----------|---------
+  "Phillip Woods",   "age",       45,   "05/06/2011",
+  "Phillip Woods",   "height",   186,   "05/06/2011",
+  "Phillip Woods",   "age",       50,   "11/25/2016",
+  "Jessica Cordero", "age",       37,   "09/13/1999",
+  "Jessica Cordero", "height",   156,   "09/13/1999"
+)
+people %>% spread(key = key, value = value)
+```
+
+Adding another column adds another variable to make the row unique after spreading. Without the extra column, the spreading algorithm wouldn't be able to explicitly organize the data table into valid rows.
+
+
 ***
 ###**4.**
 **Tidy the simple tibble below. Do you need to spread or gather it? What are the variables?**  
@@ -125,25 +188,73 @@ An object is a tibble if `[1] "tbl_df"     "tbl"        "data.frame"` is returne
 **`  "no",      20,    12`**  
 **`)`**  
 
+```{r, echo=FALSE}
+preg <- tribble(
+  ~pregnant, ~male, ~female,
+  "yes",     NA,    10,
+  "no",      20,    12
+)
+```
+
+```{r}
+preg %>% gather(male, female, key = "gender", value = "cases")
+```
+
+The initial variables are pregnant, male, and female. After tidying the data with `gather`, the new variables are pregnant, gender, and cases.
+
+
 ***
 ##**12.4.3 Exercises**
 ###**1.**
 **What do the extra and fill arguments do in `separate()`? Experiment with the various options for the following two toy datasets.**  
-```{r}
+**`tibble(x = c("a,b,c", "d,e,f,g", "h,i,j")) %>% `**  
+**`  separate(x, c("one", "two", "three"))`**  
+
+**`tibble(x = c("a,b,c", "d,e", "f,g,i")) %>% `**  
+**`  separate(x, c("one", "two", "three"))`**  
+
+The `separate` function separates one column into multiple columns. The `extra` parameter is used when the `sep` parameter is a character vector. It sets the control of what happens when there are too many values in the character vector. It can be set to `warn` to display a warning when extra values are dropped, `drop` to drop the extra values without a warning, or `merge` to split at most `n` number of times where `n` is the length of the new variables to create.  
+The `fill` parameter is used when the `sep` parameter is a character vector. It controls what happens when there are not enough pieces. It can be set to `warn` to display a warning and fill from the right, `right` to fill the missing values on the right, or `left` to fill the missing values on the left.
+
+```{r, warning=TRUE}
 tibble(x = c("a,b,c", "d,e,f,g", "h,i,j")) %>% 
-  separate(x, c("one", "two", "three"))
+  separate(x, c("one", "two", "three"), sep = ',', extra="warn")
+tibble(x = c("a,b,c", "d,e,f,g", "h,i,j")) %>% 
+  separate(x, c("one", "two", "three"), sep = ',', extra="merge")
 
 tibble(x = c("a,b,c", "d,e", "f,g,i")) %>% 
-  separate(x, c("one", "two", "three"))
+  separate(x, c("one", "two", "three"), sep = ',', fill="warn")
+tibble(x = c("a,b,c", "d,e", "f,g,i")) %>% 
+  separate(x, c("one", "two", "three"), sep = ',', fill="left")
 ```
+
 ***
 ###**2.**
 **Both `unite()` and `separate()` have a remove argument. What does it do? Why would you set it to `FALSE`?**  
 
+For `separate`, the `remove` argument sets whether to keep the original column that separated in the output. For `unite`, the argument sets whether to keep the original columns that were united in the output. By default, `remove` is set to `TRUE` so the original data is hidden. Set it to `FALSE` to view the original data and how it was transformed.
+
 ***
-##**Follow these steps:**  
+##**Baby Names**
+**Follow these steps:**   
 **- Download the baby_names.txt file from Canvas which is in the Homework 4 assignment section.**  
 **- Load this file into R correctly and take a glimpse of the output.**  
+```{r}
+file_path <- "C:\\Users\\lshen\\Documents\\Data Science\\baby_names.txt"
+name_data <- read_delim(file = file_path, delim = "|")
+glimpse(name_data)
+```
+
 **- Export this file as a csv file and call it ‘baby_names.csv’.**  
+```{r}
+write_csv(name_data, path = "C:\\Users\\lshen\\Documents\\Data Science\\baby_names.csv")
+```
+
 **- Reload the baby_names.csv file and take another glimpse.**  
+```{r}
+file_path <- "C:\\Users\\lshen\\Documents\\Data Science\\baby_names.csv"
+name_data_csv <- read_csv(file = file_path)
+glimpse(name_data_csv)
+```
+
 **- Show all of your code and the output. There should be two data import lines of code, one data export line of code, and two glimpses of the data.**  
