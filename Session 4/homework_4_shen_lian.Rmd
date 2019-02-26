@@ -51,15 +51,13 @@ cancelled_freq <- cancelled %>% group_by(year, month, day) %>% summarize(n = n()
 cancelled_freq %>% ggplot(aes(x = date, y = n)) + geom_col() + xlab("Date") + ylab("Number of cancelled flights") + ggtitle("Frequency of Cancelled Flights per Day")
 #proportion of cancelled flights per day
 cancelled_prop <- flights %>% group_by(year, month, day) %>% summarize(cancelled_proportion = mean(is.na(dep_delay) & is.na(arr_delay))) %>% mutate(date = ISOdate(year, month, day))
-cancelled_prop %>% ggplot(aes(x = date, y = cancelled_proportion)) + geom_col() + xlab("Date") + ylab("Proportion of cancelled flights") + ggtitle("Proportion of Cancelled Flights per Day")
+cancelled_prop %>% ggplot(aes(x = date, y = cancelled_proportion)) + geom_col() + geom_smooth(se = FALSE)  + xlab("Date") + ylab("Proportion of cancelled flights") + ggtitle("Proportion of Cancelled Flights per Day")
 #average delay per day
 delays <- flights %>% group_by(year, month, day) %>% summarize(average_delay = mean(arr_delay, na.rm = TRUE) + mean(dep_delay, na.rm = TRUE)) %>% mutate(date = ISOdate(year, month, day))
 delays %>% ggplot(aes(x = date, y = average_delay)) + geom_jitter() + geom_smooth(se = FALSE) + xlab("Date") + ylab("Average delay (min)") + ggtitle("Average Flight Delay per Day")
-#proportion of cancelled flights to average delay
-delayed_flights <- flights %>% group_by(year, month, day) %>% summarize(proportion = sum(is.na(dep_delay) & is.na(arr_delay))/n(), average_delay = mean(arr_delay, na.rm = TRUE) + mean(dep_delay, na.rm = TRUE)) %>% mutate(date = ISOdate(year, month, day))
-delayed_flights %>% ggplot() + geom_jitter(aes(x = date, y = proportion), color = "blue")#+ geom_smooth(aes(x = date, y = average_delay), color = "red") + coord_cartesian()
 ```
 
+There is a pattern that is shared between the number of flights cancelled per day and the proportion of flights cancelled per day. The frequency of cancelled flights seems to trend with the season. Months around July and January see spikes in the frequency of cancelled flights. The same trend is noticeable in the flight delay graph. The curve increases right around the months of July and January. It is hard to say whether the proportion of cancelled flights is related to the average delay though. They could both be related to an external factor like school summer and winter breaks being the airports' busy seasons.
 
 ***
 ###**6.**  
@@ -73,10 +71,23 @@ The `sort` argument will order the output of `count()`, which is `n`, in descend
 ***
 ###**5.**
 **Which carrier has the worst delays? Challenge: can you disentangle the effects of bad airports vs. bad carriers? Why/why not? (Hint: think about `flights %>% group_by(carrier, dest) %>% summarise(n())`)**
-```{r}
-#origin = airport
+```{r, fig.height=10, fig.width=20}
+delay_by_carrier_dest <- flights %>% group_by(carrier, dest) %>% summarise(average_delay = mean(arr_delay, na.rm = TRUE))
+delay_by_carrier_dest %>% ggplot() + geom_col(aes(x = carrier, y = average_delay, fill = dest), position = "dodge",show.legend = FALSE) + xlab("Carrier") + ylab("Average delay (min)") + ggtitle("Average Flight Delay by Carrier and Destination Airport")
+#add average airport delay to data
+delay_by_dest <- flights %>% group_by(dest) %>% summarise(average_dest_delay = mean(arr_delay, na.rm = TRUE))
+carrier_delays_dest_delays <- left_join(delay_by_carrier_dest, delay_by_dest)
+delay_by_dest %>% ggplot() + geom_col(aes(x = dest, y = average_dest_delay, fill=dest),show.legend = FALSE) + xlab("Airport") + ylab("Average delay (min)") + ggtitle("Average Delay at Destination Airport") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+#remove dest airport's average delay effects from carrier
+#difference from airport delay is carrier delay without airport delay effects
+carrier_delays_baseline <- carrier_delays_dest_delays %>% mutate(isolated_carrier_delay = average_delay-average_dest_delay)
+carrier_delays_baseline %>% ggplot(aes(x = carrier, y = isolated_carrier_delay, fill = dest)) + geom_col(position = "dodge",show.legend = FALSE) + xlab("Carrier") + ylab("Average delay (min)") + ggtitle("Baseline Average Carrier Delay without Airport Delay Effects")
+#ignore dest and get average_carrier_delay now that airport delays is accounted for
+carrier_delays <- carrier_delays_baseline %>% group_by(carrier) %>% summarize(average_carrier_delay = mean(isolated_carrier_delay, na.rm = TRUE))
+carrier_delays %>% ggplot(aes(x = carrier, y = average_carrier_delay)) + geom_col() + xlab("Carrier") + ylab("Average delay (min)") + ggtitle("Average Carrier Delay")
 ```
 
+After removing the effects of the average airport delays from each carrier at the specific airport and taking the carriers' average delays, OO seems to have the worst delays.
 
 ***
 ##**10.5 Exercises**
