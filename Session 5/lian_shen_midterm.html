@@ -191,6 +191,41 @@ $(document).ready(function () {
 
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#the-tidyverse-packages"><strong>The tidyverse packages</strong></a><ul>
+<li><a href="#section"><strong>1.</strong></a></li>
+<li><a href="#section-1"><strong>2.</strong></a></li>
+</ul></li>
+<li><a href="#r-basics"><strong>R Basics</strong></a><ul>
+<li><a href="#section-2"><strong>1.</strong></a></li>
+<li><a href="#section-3"><strong>2.</strong></a></li>
+<li><a href="#section-4"><strong>3.</strong></a></li>
+</ul></li>
+<li><a href="#data-importexport"><strong>Data import/export</strong></a><ul>
+<li><a href="#section-5"><strong>1.</strong></a></li>
+<li><a href="#section-6"><strong>2.</strong></a></li>
+</ul></li>
+<li><a href="#visualization"><strong>Visualization</strong></a><ul>
+<li><a href="#section-7"><strong>1.</strong></a></li>
+<li><a href="#section-8"><strong>2.</strong></a></li>
+<li><a href="#section-9"><strong>3.</strong></a></li>
+</ul></li>
+<li><a href="#data-munging-and-wrangling"><strong>Data munging and wrangling</strong></a><ul>
+<li><a href="#section-10"><strong>1.</strong></a></li>
+<li><a href="#section-11"><strong>2.</strong></a></li>
+<li><a href="#section-12"><strong>3.</strong></a></li>
+</ul></li>
+<li><a href="#eda"><strong>EDA</strong></a><ul>
+<li><a href="#section-13"><strong>1.</strong></a></li>
+<li><a href="#section-14"><strong>2.</strong></a></li>
+<li><a href="#section-15"><strong>3.</strong></a></li>
+<li><a href="#section-16"><strong>4.</strong></a></li>
+<li><a href="#section-17"><strong>5.</strong></a></li>
+<li><a href="#section-18"><strong>6.</strong></a></li>
+</ul></li>
+</ul>
+</div>
 
 <style type="text/css">
 pre code, pre, code {
@@ -200,6 +235,144 @@ pre code, pre, code {
   word-wrap: initial !important;
 }
 </style>
+<pre class="r"><code>library(tidyverse)
+library(nycflights13)</code></pre>
+<hr />
+<p>Github repository: <a href="https://github.com/lianshen/compscix-415-2-assignments" class="uri">https://github.com/lianshen/compscix-415-2-assignments</a></p>
+<hr />
+<div id="the-tidyverse-packages" class="section level2">
+<h2><strong>The tidyverse packages</strong></h2>
+<div id="section" class="section level3">
+<h3><strong>1.</strong></h3>
+<p><strong>Can you name which package is associated with each task below?</strong><br />
+Plotting -<br />
+Data munging/wrangling -<br />
+Reshaping (speading and gathering) data -<br />
+Importing/exporting data -</p>
+<hr />
+</div>
+<div id="section-1" class="section level3">
+<h3><strong>2.</strong></h3>
+<p><strong>Now can you name two functions that you’ve used from each package that you listed above for these tasks?</strong><br />
+Plotting -<br />
+Data munging/wrangling -<br />
+Reshaping data -<br />
+Importing/exporting data -</p>
+<hr />
+</div>
+</div>
+<div id="r-basics" class="section level2">
+<h2><strong>R Basics</strong></h2>
+<div id="section-2" class="section level3">
+<h3><strong>1.</strong></h3>
+<p><strong>Fix this code <em>with the fewest number of changes possible</em> so it works:</strong><br />
+<strong><code>My_data.name___is.too00ooLong! &lt;- c( 1 , 2 , 3 )</code></strong></p>
+<hr />
+</div>
+<div id="section-3" class="section level3">
+<h3><strong>2.</strong></h3>
+<p><strong>Fix this code so it works:</strong><br />
+<strong><code>my_string &lt;- C('has', 'an', 'error', 'in', 'it)</code></strong></p>
+<hr />
+</div>
+<div id="section-4" class="section level3">
+<h3><strong>3.</strong></h3>
+<p><strong>Look at the code below and comment on what happened to the values in the vector.</strong><br />
+<strong><code>my_vector &lt;- c(1, 2, '3', '4', 5)</code></strong><br />
+<strong><code>my_vector</code></strong></p>
+<p><strong><code>## [1] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; &quot;5&quot;</code></strong></p>
+<hr />
+</div>
+</div>
+<div id="data-importexport" class="section level2">
+<h2><strong>Data import/export</strong></h2>
+<div id="section-5" class="section level3">
+<h3><strong>1.</strong></h3>
+<p><strong>Download the rail_trail.txt file from Canvas (in the Midterm Exam section) and successfully import it into R. Prove that it was imported successfully by including your import code and taking a <code>glimpse</code> of the result.</strong></p>
+<hr />
+</div>
+<div id="section-6" class="section level3">
+<h3><strong>2.</strong></h3>
+<p><strong>Export the file into a comma-separated file and name it “rail_trail.csv”. Make sure you define the <code>path</code> correctly so that you know where it gets saved. Then reload the file. Include your export and import code and take another <code>glimpse</code>.</strong></p>
+<hr />
+</div>
+</div>
+<div id="visualization" class="section level2">
+<h2><strong>Visualization</strong></h2>
+<div id="section-7" class="section level3">
+<h3><strong>1.</strong></h3>
+<p><strong>Critique this graphic: give only three examples of what is wrong with this graphic. Be concise.</strong></p>
+<hr />
+</div>
+<div id="section-8" class="section level3">
+<h3><strong>2.</strong></h3>
+<p><strong>Reproduce this graphic using the diamonds data set.</strong></p>
+<hr />
+</div>
+<div id="section-9" class="section level3">
+<h3><strong>3.</strong></h3>
+<p><strong>The previous graphic is not very useful. We can make it much more useful by changing one thing about it. Make the change and plot it again.</strong></p>
+<hr />
+</div>
+</div>
+<div id="data-munging-and-wrangling" class="section level2">
+<h2><strong>Data munging and wrangling</strong></h2>
+<div id="section-10" class="section level3">
+<h3><strong>1.</strong></h3>
+<p><strong>Is this data “tidy”? If yes, leave it alone and go to the next problem. If no, make it tidy. <em>Note: this data set is called table2 and is available in the tidyverse package. It should be ready for you to use after you’ve loaded the tidyverse package</em>.</strong></p>
+<hr />
+</div>
+<div id="section-11" class="section level3">
+<h3><strong>2.</strong></h3>
+<p><strong>Create a new column in the diamonds data set called <code>price_per_carat</code> that shows the price of each diamond per carat (hint: divide). Only show me the code, not the output.</strong></p>
+<hr />
+</div>
+<div id="section-12" class="section level3">
+<h3><strong>3.</strong></h3>
+<p><strong>For each cut of diamond in the diamonds data set, how many diamonds, and what proportion, have a price &gt; 10000 and a carat &lt; 1.5? There are several ways to get to an answer, but your solution must use the data wrangling verbs from the tidyverse in order to get credit.</strong><br />
+<strong>• Do the results make sense? Why?</strong><br />
+<strong>• Do we need to be wary of any of these numbers? Why?</strong></p>
+<hr />
+</div>
+</div>
+<div id="eda" class="section level2">
+<h2><strong>EDA</strong></h2>
+<p><strong>Take a look at the <code>txhousing</code> data set that is included with the <code>ggplot2</code> package and answer these questions:</strong></p>
+<div id="section-13" class="section level3">
+<h3><strong>1.</strong></h3>
+<p><strong>During what time period is this data from?</strong></p>
+<hr />
+</div>
+<div id="section-14" class="section level3">
+<h3><strong>2.</strong></h3>
+<p><strong>How many cities are represented?</strong></p>
+<hr />
+</div>
+<div id="section-15" class="section level3">
+<h3><strong>3.</strong></h3>
+<p><strong>Which city, month and year had the highest number of sales?</strong></p>
+<hr />
+</div>
+<div id="section-16" class="section level3">
+<h3><strong>4.</strong></h3>
+<p><strong>What kind of relationship do you think exists between the number of listings and the number of sales? Check your assumption and show your work.</strong></p>
+<hr />
+</div>
+<div id="section-17" class="section level3">
+<h3><strong>5.</strong></h3>
+<p><strong>What proportion of sales is missing for each city?</strong></p>
+<hr />
+</div>
+<div id="section-18" class="section level3">
+<h3><strong>6.</strong></h3>
+<p><strong>Looking at only the cities and months with greater than 500 sales:</strong><br />
+<strong>• Are the distributions of the median sales price (column name median), when grouped by city, different? The same? Show your work.</strong><br />
+<strong>• Any cities that stand out that you’d want to investigate further?</strong><br />
+<strong>• Why might we want to filter out all cities and months with sales less than 500?</strong></p>
+<hr />
+<p>Once you are finished with your midterm, commit your final changes with the comment “finished the midterm - woohoo” and push your R Markdown file and your html or pdf file to Github.</p>
+</div>
+</div>
 
 
 
