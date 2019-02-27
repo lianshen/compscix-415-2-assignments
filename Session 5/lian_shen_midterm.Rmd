@@ -1,0 +1,22 @@
+---
+title: "COMPSCIX 415.2 Homework 5/Midterm"
+author: "Lian Shen"
+date: "February 26, 2019"
+output: 
+  html_document:
+    self_contained: true
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = 'center')
+```
+
+```{css, echo=FALSE}
+pre code, pre, code {
+  white-space: pre !important;
+  overflow-x: scroll !important;
+  word-break: keep-all !important;
+  word-wrap: initial !important;
+}
+```
