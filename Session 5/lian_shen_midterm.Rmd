@@ -22,42 +22,50 @@ pre code, pre, code {
 ```
 
 
-```{r load_libraries}
-library(tidyverse)
-library(nycflights13)
-```
-
 ***
 
 Github repository: https://github.com/lianshen/compscix-415-2-assignments 
+
+Load libraries
+```{r load_libraries}
+library(tidyverse)
+```
 
 ***
 ##**The tidyverse packages**
 ###**1.**  
 **Can you name which package is associated with each task below?**  
-Plotting -  
-Data munging/wrangling -  
-Reshaping (speading and gathering) data -  
-Importing/exporting data -  
+**• Plotting -** `ggplot2`  
+**• Data munging/wrangling -** `dplyr`  
+**• Reshaping (speading and gathering) data -** `tidyr`  
+**• Importing/exporting data -** `readr`  
 
 ***
 ###**2.**  
 **Now can you name two functions that you’ve used from each package that you listed above for these tasks?**  
-Plotting -  
-Data munging/wrangling -  
-Reshaping data -  
-Importing/exporting data -  
+**• Plotting -** `geom_bar()` and `geom_histogram()`  
+**• Data munging/wrangling -** `filter()` and `summarize()`  
+**• Reshaping data -** `gather()` and `spread()`  
+**• Importing/exporting data -** `read_csv()` and `write_delim()`  
 
 ***
 ##**R Basics**  
 ###**1.**  
 **Fix this code *with the fewest number of changes possible* so it works:**  
 **`My_data.name___is.too00ooLong! <- c( 1 , 2 , 3 )`**  
+```{r}
+#remove invalid ! character
+My_data.name___is.too00ooLong <- c( 1 , 2 , 3 )
+```
 
 ***
 ###**2.**  
 **Fix this code so it works:**  
 **`my_string <- C('has', 'an', 'error', 'in', 'it)`**
+```{r}
+#combine function c() is lowercase. must end last string argument with quote '
+my_string <- c('has', 'an', 'error', 'in', 'it')
+```
 
 ***
 ###**3.**
@@ -66,6 +74,10 @@ Importing/exporting data -
 **`my_vector`**  
 
 **`## [1] "1" "2" "3" "4" "5"`**  
+
+All values in the vector were converted to characters because  
+1. `c()` combines its arguments and converts them to a common type while doing so.  
+2. The common type decided upon depends on the highest type of argument listed following the hierarchy: `NULL` < `raw` < `logical` < `integer` < `double` < `complex` < `character` < `list` < `expression`. Out of the types listed as arguments (`character` and `integer`), `character` types are higher than `integer` types.
 
 ***
 ##**Data import/export**
