@@ -77,7 +77,7 @@ my_string <- c('has', 'an', 'error', 'in', 'it')
 
 All values in the vector were converted to characters because  
 1. `c()` combines its arguments and converts them to a common type while doing so.  
-2. The common type decided upon depends on the highest type of argument listed following the hierarchy: `NULL` < `raw` < `logical` < `integer` < `double` < `complex` < `character` < `list` < `expression`. Out of the types listed as arguments (`character` and `integer`), `character` types are higher than `integer` types.
+2. The common type decided upon depends on the highest type of argument listed following the hierarchy: `NULL` < `raw` < `logical` < `integer` < `double` < `complex` < `character` < `list` < `expression`. Out of the types listed as arguments (`character` and `integer`), `character` types are higher than `integer` types, so all values are converted to `character`.
 
 ***
 ##**Data import/export**
@@ -105,10 +105,10 @@ glimpse(new_rail_trail_data)
 ***
 ##**Visualization**
 ###**1.**  
-**Critique this graphic: give only three examples of what is wrong with this graphic. Be concise.** 
+**Critique this graphic: give only three examples of what is wrong with this graphic. Be concise.**  
 1. Using circles (area) as a metric for response count is difficult to compare.  
 2. The categories used is not consistent: the graphic is first comparing by age group, then by gender.  
-3. There is no point in coloring by gender if the age group classes don't specify gender ratio.
+3. There is no point in coloring by gender since the age group classes don't specify gender ratio.
 
 ***
 ###**2.** 
@@ -123,6 +123,7 @@ diamonds %>% ggplot(aes(x = cut, y = carat, fill=color)) + geom_boxplot(position
 **The previous graphic is not very useful. We can make it much more useful by changing one thing about it. Make the change and plot it again.**
 
 ```{r}
+#to see each color's distribution
 diamonds %>% ggplot(aes(x = cut, y = carat, fill=color)) + geom_boxplot(position = "dodge") + xlab("CUT OF DIAMOND") + ylab("CARAT OF DIAMOND") + coord_flip()
 ```
 
@@ -154,45 +155,102 @@ diamonds %>% mutate(price_per_carat = price/carat)
 ###**3.**
 **For each cut of diamond in the diamonds data set, how many diamonds, and what proportion, have a price > 10000 and a carat < 1.5? There are several ways to get to an answer, but your solution must use the data wrangling verbs from the tidyverse in order to get credit.**  
 ```{r}
-expensive_diamonds <- diamonds %>% select(cut, price, carat) %>% group_by(cut) %>% mutate(total_cut = n()) %>% filter(price > 10000 & carat < 1.5) %>% mutate(expensive_count = n()) %>% mutate(proportion = expensive_count/total_cut) %>% select(cut, expensive_count, total_cut, proportion) %>% distinct()
-View(expensive_diamonds)
-expensive_diamonds %>% ggplot(aes(x=cut, y=proportion)) + geom_col()
+expensive_diamonds <- diamonds %>% select(cut, price, carat) %>% group_by(cut) %>% mutate(total_cut = n()) %>% filter(price > 10000 & carat < 1.5) %>% mutate(expensive_count = n()) %>% mutate(proportion = expensive_count/total_cut)
+expensive_diamonds %>% select(cut, expensive_count, total_cut, proportion) %>% distinct() %>% ggplot(aes(x=cut, y=proportion)) + geom_col()
 ```
 
 **• Do the results make sense? Why?**  
+The general trend of the proportion increasing as cut quality increases makes sense since the filter targets higher priced for smaller carat diamonds. I would expect that the higher the cut quality, the more expensive the diamond for a given carat size.
+
 **• Do we need to be wary of any of these numbers? Why?**  
+There is a discrepancy between "Very Good" and "Premium" cuts, where "Premium" cuts proportion of expensive diamonds is lower than the proportion of "Very Good" cuts. This wouldn't make sense if we assumed the distribution of carat was uniform between all cuts, but after plotting the distribution of carats, we can see that the distributions are not the same,, and introducing the filter like above without knowing the distribution can lead to some unexpected results.
+```{r}
+diamonds %>% ggplot(aes(x = cut, y = carat)) + geom_boxplot() + coord_flip()
+diamonds %>% ggplot(aes(x = carat)) + geom_histogram(binwidth=0.05) + facet_wrap(~cut, nrow = 3)
+```
 
 ***
 ##**EDA**  
 **Take a look at the `txhousing` data set that is included with the `ggplot2` package and answer these questions:**
 
+```{r}
+glimpse(txhousing)
+```
+
 
 ###**1.**  
 **During what time period is this data from?**
+```{r}
+txhousing %>% arrange(year, month)
+txhousing %>% arrange(desc(year), desc(month))
+```
+The time period of collected data was from Jan 2000 to July 2015.
 
 ***
 ###**2.**
-**How many cities are represented?**
+**How many cities are represented?**  
+```{r}
+txhousing %>% distinct(city)
+```
+There are 46 cities listed.
 
 ***
 ###**3.**
-**Which city, month and year had the highest number of sales?**
+**Which city, month and year had the highest number of sales?**  
+```{r}
+txhousing %>% arrange(desc(sales))
+```
+In July 2015, Houston had the highest number of sales out of this dataset.
 
 ***
 ###**4.**
-**What kind of relationship do you think exists between the number of listings and the number of sales? Check your assumption and show your work.**
+**What kind of relationship do you think exists between the number of listings and the number of sales? Check your assumption and show your work.**  
+```{r}
+#initial glance
+txhousing %>% ggplot(aes(x = listings, y = sales)) + geom_jitter(alpha = 0.2)
+#spread out cluster near the origin
+txhousing %>% ggplot(aes(x = log(listings), y = log(sales))) + geom_jitter(alpha = 0.2)
+#see if city sales vs listing follows same trend
+txhousing %>% ggplot(aes(x = log(listings), y = log(sales), color = city)) + geom_jitter(alpha = 0.2, show.legend = FALSE)
+txhousing %>% ggplot(aes(x = listings, y = sales, color = city)) + geom_jitter(alpha = 0.2, show.legend = FALSE) + geom_smooth(se = FALSE,show.legend = FALSE)
+txhousing %>% ggplot(aes(x = log(listings), y = log(sales), color = city)) + geom_jitter(alpha = 0.2, show.legend = FALSE) + geom_smooth(se = FALSE,show.legend = FALSE)
+#see if amount of time it would take to sell current listings at current pace of sales trends with sales vs listings
+txhousing %>% ggplot(aes(x = log(listings), y = log(sales), color = inventory)) + geom_jitter(alpha=0.5) #the longer on market trends with lower sales for more listings
+txhousing %>% mutate(sales_per_listing = sales/listings) %>% ggplot(aes(x = date, y = sales_per_listing, color = inventory)) + geom_point()
+#see how sales/listing trends over time for each city
+txhousing %>% mutate(sales_per_listing = sales/listings) %>% ggplot(aes(x = date, y = sales_per_listing, color = city)) + geom_smooth(show.legend = FALSE, se = FALSE)
+```
+I would think that as listings increases, sales would also increase. This is true when looking at cities as a whole (and not distinguishing between cities), but this doesn't seem to be the case though once we plot by city's sales to listings distribution. This could be because of an underlying factor such as the cyclical nature of supply and demand of housing and the dependency on the housing market/period of time.
 
 ***
 ###**5.**
 **What proportion of sales is missing for each city?**
 
+```{r}
+txhousing %>% select(city, sales) %>% group_by(city) %>% mutate(total_city_observations = n())  %>% mutate(missing_sales = sum(is.na(sales))) %>% mutate(proportion_sales_missing = missing_sales/total_city_observations) %>% select(city, total_city_observations, missing_sales, proportion_sales_missing) %>% distinct()
+```
+
+
 ***
 ###**6.**
 **Looking at only the cities and months with greater than 500 sales:**  
+```{r}
+greater_than_500_sales <- txhousing %>% filter(sales > 500)
+```
+
 **• Are the distributions of the median sales price (column name median), when grouped by city, different? The same? Show your work.**  
+```{r}
+median_sales<- greater_than_500_sales %>% group_by(city) %>% summarize(median_sales_dist = median(median))
+median_sales %>% ggplot(aes(x=reorder(city, median_sales_dist), y = median_sales_dist)) + geom_col() + coord_flip()
+greater_than_500_sales %>% ggplot(aes(x = reorder(city, median, FUNC = median), y = median)) + geom_boxplot() + coord_flip()
+```
+
+The distribution of median sales price is different for each city.
+
 **• Any cities that stand out that you’d want to investigate further?**  
+Corpus Christi has a very narrow distribution of median sales price. I would expect its standard deviation to be much smaller than the rest of the cities. On the opposite side of the spectrum, Fort Bend has a very wide distribution of median sales price.
+
 **• Why might we want to filter out all cities and months with sales less than 500?**  
+A sample size of less than 500 may not be enough to be representative of the city's sales.
 
 ***
-Once you are finished with your midterm, commit your final changes with the comment “finished the midterm
-- woohoo” and push your R Markdown file and your html or pdf file to Github.
