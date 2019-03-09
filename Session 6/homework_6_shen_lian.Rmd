@@ -81,22 +81,37 @@ The outcome makes sense now that the visualization is faceted by age group. The 
 n <- 10000
 
 # look at ?rgamma to read about this function
+# f(x)= 1/(scale^shape Gamma(shape)) x^(shape-1) e^-(x/scale)
 gamma_samp <- tibble(x = rgamma(n, shape = 1, scale = 2))
+gamma_samp %>% ggplot(aes(x = x)) + geom_histogram()
 ```
-
 
 ***
 ###**2.**
 **What is the mean and standard deviation of your sample? They should both be close to 2 because for a gamma distribution:**  
 **mean = shape x scale**  
 **variance = shape x scale^2**  
-
-***
-###**3.**
 ```{r}
 mean_samp <- gamma_samp %>% .[['x']] %>% mean()
 ```
+```{r}
+mean_samp
+gamma_samp %>% summarize(mean = mean(x), standard_dev = sd(x))
+```
+
+***
+###**3.**
 **Pretend the distribution of our population of data looks like the plot above. Now take a sample of size n = 30 from a Gamma(1,2) distribution, plot the histogram or density curve, and calculate the mean and standard deviation.**
+
+```{r}
+n <- 30
+gamma_samp <- tibble(x = rgamma(n, shape = 1, scale = 2))
+#histogram
+gamma_samp %>% ggplot(aes(x = x)) + geom_histogram()
+#mean and sd
+gamma_samp %>% summarize(mean = mean(x), standard_dev = sd(x))
+```
+
 
 ***
 ###**4.**
@@ -105,31 +120,66 @@ mean_samp <- gamma_samp %>% .[['x']] %>% mean()
 ```{r}
 # create a vector with 10000 NAs
 mean_samp <- rep(NA, 10000)
+n <- 30
 
 # start a loop
 for(i in 1:10000) {
-  g_samp <- rgamma(30, shape = 1, scale = 2)
+  g_samp <- rgamma(n, shape = 1, scale = 2)
   mean_samp[i] <- mean(g_samp)
 }
 
 # convert vector to a tibble
 mean_samp <- tibble(mean_samp)
+mean_samp
 ```
 
 ***
 ###**5.**
 **Make a histogram of your collection of means from above (`mean_samp`).**
 
+```{r}
+mean_samp %>% ggplot(aes(x = mean_samp)) + geom_histogram()
+```
+
 ***
 ###**6.** 
 **Calculate the mean and standard deviation of all of your sample means.**
+
+```{r}
+mean_samp %>% summarize(mean = mean(mean_samp), standard_dev = sd(mean_samp))
+```
 
 ***
 ###**7.**
 **Did anything surprise you about your answers to #6?**
 
+The mean is very close to the expected mean of 2.
+
 ***
 ###**8.** 
 **According to the Central Limit Theorem, the mean of your sampling distribution should be very close to 2, and the standard deviation of your sampling distribution should be close to 0.365. Repeat #4-#6, but now with a sample of size n = 300 instead. Do your results match up well with the theorem?**
+
+```{r}
+n <- 300
+
+# create a vector with 10000 NAs
+mean_samp <- rep(NA, 10000)
+
+# start a loop
+for(i in 1:10000) {
+  g_samp <- rgamma(n, shape = 1, scale = 2)
+  mean_samp[i] <- mean(g_samp)
+}
+
+# convert vector to a tibble
+mean_samp <- tibble(mean_samp)
+mean_samp
+mean_samp %>% ggplot(aes(x = mean_samp)) + geom_histogram()
+mean_samp %>% summarize(mean = mean(mean_samp), standard_dev = sd(mean_samp))
+expected_standard_dev <- 2/sqrt(n)
+expected_standard_dev
+```
+
+The results match well with the theorem. The mean of the sampling distribution is very close to 2, and the standard deviation of the sampling distribution is close to 2/sqrt(300).
 
 ***
