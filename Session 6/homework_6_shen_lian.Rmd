@@ -27,3 +27,109 @@ Load libraries
 library(tidyverse)
 library(mosaicData)
 ```
+
+***
+##**Exercise 1**
+
+```{r}
+data("Whickham")
+```
+
+###**1.** 
+**What variables are in this dataset?**
+
+There are three variables: `outcome`, `smoker`, and `age`.
+
+***
+###**2.** 
+**How many observations are there and what does each represent?** 
+
+There are 1314 observations. Each observation represents a woman's data on age, smoking, and mortality in whickham between 1972-1974.
+
+***
+###**3.** 
+**Create a table and a visualization of the relationship between smoking status and outcome, ignoring age. What do you see? Does it make sense?**
+
+```{r}
+smoker_outcome <- Whickham %>% select(smoker, outcome) %>% group_by(smoker, outcome) %>% summarize(freq = n())
+smoker_outcome
+smoker_outcome %>% ggplot(aes(x = smoker, y = freq, fill = outcome)) + geom_col(position = "fill")
+```
+
+The outcome isn't what I would expect. The ratio of dead:alive smokers is lower than the ratio of dead:alive non-smokers. I would expect the reverse to be true since smoking is linked to lung cancer and death.
+
+***
+###**4.**
+**Recode the `age` variable into an ordered factor with three categories: age <= 44, age > 44 & age <= 64, and age > 64. Now, recreate visualization from above, but facet on your new age factor. What do you see? Does it make sense?**
+
+```{r}
+Whickham_age_group <- Whickham %>% mutate(age_fact = fct_relevel(factor(case_when(Whickham$age <= 44 ~ 'Young', Whickham$age > 44 & Whickham$age <= 64 ~ 'Middle', Whickham$age > 64 ~ 'Old'), ordered = TRUE), 'Young', 'Middle', 'Old')) %>% group_by(smoker, outcome, age_fact) %>% summarize(freq = n())
+Whickham_age_group
+Whickham_age_group %>% ggplot(aes(x = smoker, y = freq, fill = outcome)) + geom_col(position = "fill") + facet_wrap(~ age_fact)
+```
+
+The outcome makes sense now that the visualization is faceted by age group. The older the group, the higher the dead:alive ratio is for both smokers and non-smokers. The ratio is also higher for smokers than for non-smokers.
+
+***
+##**Exercise 2**  
+**The Central Limit Theorem states that the sampling distribution of sample means is approximately Normal, regardless of the distribution of your population. For this exercise our population distribution will be a Gamma(1,2) distribution, and we’ll show that the sampling distribution of the mean is in fact normally distributed.**  
+
+###**1.**  
+**Generate a random sample of size n = 10000 from a gamma(1,2) distribution and plot a histogram or density curve.* Use the code below to help you get your sample.**
+
+```{r}
+n <- 10000
+
+# look at ?rgamma to read about this function
+gamma_samp <- tibble(x = rgamma(n, shape = 1, scale = 2))
+```
+
+
+***
+###**2.**
+**What is the mean and standard deviation of your sample? They should both be close to 2 because for a gamma distribution:**  
+**mean = shape x scale**  
+**variance = shape x scale^2**  
+
+***
+###**3.**
+```{r}
+mean_samp <- gamma_samp %>% .[['x']] %>% mean()
+```
+**Pretend the distribution of our population of data looks like the plot above. Now take a sample of size n = 30 from a Gamma(1,2) distribution, plot the histogram or density curve, and calculate the mean and standard deviation.**
+
+***
+###**4.**
+**Take a sample of size n = 30, again from the Gamma(1,2) distribution, calculate the mean, and assign it to a vector named `mean_samp`. Repeat this 10000 times!!!!**
+
+```{r}
+# create a vector with 10000 NAs
+mean_samp <- rep(NA, 10000)
+
+# start a loop
+for(i in 1:10000) {
+  g_samp <- rgamma(30, shape = 1, scale = 2)
+  mean_samp[i] <- mean(g_samp)
+}
+
+# convert vector to a tibble
+mean_samp <- tibble(mean_samp)
+```
+
+***
+###**5.**
+**Make a histogram of your collection of means from above (`mean_samp`).**
+
+***
+###**6.** 
+**Calculate the mean and standard deviation of all of your sample means.**
+
+***
+###**7.**
+**Did anything surprise you about your answers to #6?**
+
+***
+###**8.** 
+**According to the Central Limit Theorem, the mean of your sampling distribution should be very close to 2, and the standard deviation of your sampling distribution should be close to 0.365. Repeat #4-#6, but now with a sample of size n = 300 instead. Do your results match up well with the theorem?**
+
+***
