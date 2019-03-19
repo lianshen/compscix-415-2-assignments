@@ -25,7 +25,7 @@ pre code, pre, code {
 Load libraries
 ```{r load_libraries}
 library(tidyverse)
-library(mosaicData)
+library(broom)
 ```
 
 ***
@@ -33,47 +33,131 @@ library(mosaicData)
 **Load the train.csv dataset into R. How many observations and columns are there?**
 
 ```{r}
-
+filepath <- "C:\\Users\\lshen\\Documents\\Data Science\\train.csv"
+train_data <- read_csv(file = filepath)
+glimpse(train_data)
 ```
+
+There are 1,460 observations and 81 variables.
 
 ***
 ##**Exercise 2**
 **Normally at this point you would spend a few days on EDA, but for this homework we will do some very basic EDA and get right to fitting some linear regression models.**  
 **Our target will be `SalePrice`.**  
 **• Visualize the distribution of `SalePrice`.**  
+```{r}
+train_data %>% ggplot(aes(x = SalePrice)) + geom_histogram()
+```
+
 **• Visualize the covariation between `SalePrice` and `Neighborhood`.**  
+```{r}
+train_data %>% ggplot(aes(x = Neighborhood, y = SalePrice)) + geom_boxplot() + coord_flip()
+```
+
 **• Visualize the covariation between `SalePrice` and `OverallQual`.**  
+```{r}
+train_data %>% ggplot(aes(x = OverallQual, y = SalePrice)) + geom_boxplot(aes(group = cut_width(OverallQual, 1)))
+```
+
 
 ***
 ##**Exercise 3**
 **Our target is called `SalePrice`. First, we can fit a simple regression model consisting of only the intercept (the average of `SalePrice`). Fit the model and then use the `broom` package to**  
 **• take a look at the coefficient,**  
-**• compare the coefficient to the average value of `SalePrice`, and**  
-**• take a look at the R-squared.**  
+**• compare the coefficient to the average value of `SalePrice`, and**  The coefficient is 180921.2 which is the same as the mean `SalePrice`  
+**• take a look at the R-squared.**  The R-squared value is 0 because we are not fitting the model to an independent variable. This coincides with the formula for R-squared = 1 - (sum of squared residuals)/(total sum of squares). In this case the model's sum of squared residuals is the same as the total sum of squares so 1 - SS/SS = 0.  
+
+```{r}
+train_data <- train_data %>% mutate(average_SalePrice = mean(SalePrice))
+first(train_data$average_SalePrice)
+saleprice_lm <- lm(formula = SalePrice ~ average_SalePrice, data = train_data)
+tidy(saleprice_lm)
+glance(saleprice_lm)
+```
+
 
 ***
 ##**Exercise 4**
 **Now fit a linear regression model using `GrLivArea`, `OverallQual`, and `Neighborhood` as the features. Don’t forget to look at `data_description.txt` to understand what these variables mean. Ask yourself these questions before fitting the model:**  
-**• What kind of relationship will these features have with our target?**  
-**• Can the relationship be estimated linearly?**  
-**• Are these good features, given the problem we are trying to solve?**  
+**• What kind of relationship will these features have with our target?**  `SalePrice` may increase with increasing `GrLivArea` (which is above ground living area square feet).  `SalePrice` may also increase with `OverallQual`. The relationship between `SalePrice` and `Neighborhood` will be harder to identify, but generally a nicer neighborhood would correlate with higher `SalePrice`.  
+**• Can the relationship be estimated linearly?**  Potentially, but the relationship may not actually be linear.  
+**• Are these good features, given the problem we are trying to solve?**  These features may correlate with `SalePrice`.  
 **After fitting the model, output the coefficients and the R-squared using the `broom` package.**  
+
+```{r}
+train_data <- train_data %>% mutate(neighborhood_factor = factor(train_data$Neighborhood))
+saleprice_lm <- lm(formula = SalePrice ~ GrLivArea + OverallQual + Neighborhood, data = train_data)
+tidy(saleprice_lm)
+levels(train_data$neighborhood_factor)
+```
+
+
 **Answer these questions:**  
-**• How would you interpret the coefficients on `GrLivArea` and `OverallQual`?**  
-**• How would you interpret the coefficient on `NeighborhoodBrkSide`?**  
-**• Are the features significant?**  
-**• Are the features practically significant?**  
-**• Is the model a good fit?**  
+**• How would you interpret the coefficients on `GrLivArea` and `OverallQual`?**  The variables `GrLivArea` and `OverallQual` have a positive linear trend with `SalePrice`. With increasing `GrLivarea` and `OverallQual`, `SalePrice` increases.  
+**• How would you interpret the coefficient on `NeighborhoodBrkSide`?**  BrkSide is selling about $13,025.4529 less than Blmgtn (which is the reference factor for Neighborhood).  
+**• Are the features significant?**  `GrLivArea` and `OverallQual` seem significant since the p-value is less than 0.05, so they seem significantly different than 0. `Neighborhood` doesn't seem as significant with its p-value fluctuating below and above 0.05.
+**• Are the features practically significant?**  `GrLivArea` and `OverallQual` seem to be practically significant. For every one unit increase in living area square feet, the `SalePrice` increases by $55.56. For every one unit increase in `OverallQual` the `SalePrice` increases by $20,951.42 (which at first seems like a large amount, but after comparing the `SalePrice` range 0:700,000 to the `OverallQual` range 1:10, the unit increase makes sense, from Exercise 2). `Neighborhood` is harder to tell if it is practically significant since we don't really have an understanding of each of the neighborhood's conditions to compare to the reference neighborhood Blmgtn.  
+**• Is the model a good fit?**  The model is generally a good fit with the adjusted r-squared value being 78.3%, meaning 78.3% of the model's variability can be explained by the features.  
+```{r}
+glance(saleprice_lm)
+```
+
+
 
 ***
 ##**Exercise 5**
 **Feel free to play around with linear regression. Add some other features and see how the model results change.**
 
+LotArea: Lot size in square feet  
+OverallQual: Rates the overall material and finish of the house  
+OverallCond: Rates the overall condition of the house  
+YearBuilt: Original construction date  
+
+```{r}
+train_data %>% ggplot(aes(x = LotArea, y = SalePrice, color = MSZoning)) + geom_point(alpha = 0.2)
+train_data %>% ggplot(aes(x = OverallCond, y = SalePrice)) + geom_boxplot(aes(group = cut_width(OverallCond, 1)))
+train_data %>% ggplot(aes(x = YearBuilt, y = SalePrice)) + geom_boxplot(aes(group = cut_width(YearBuilt, 10)))
+test_lm <- lm(SalePrice ~ LotArea + OverallCond + YearBuilt, data = train_data)
+tidy(test_lm)
+glance(test_lm)
+test_lm <- lm(SalePrice ~ LotArea + OverallQual + OverallCond + YearBuilt, data = train_data)
+tidy(test_lm)
+glance(test_lm)
+```
+
+
 ***
 ##**Exercise 6**
 **One downside of the linear model is that it is sensitive to unusual values because the distance incorporates a squared term. Fit a linear model to the simulated data below (use y as the target and x as the feature), and look at the resulting coefficients and R-squared. Rerun it about 5-6 times to generate different simulated datasets. What do you notice about the model’s coefficient on x and the R-squared values?**
 
+The model's intercept coefficient seems to be around 1.5 and the slope coefficient hovers around 6. The R-squared values seem to decrease with increasing standard deviation of y.
 ```{r}
 sim1a <- tibble(x = rep(1:10, each = 3),y = x * 1.5 + 6 + rt(length(x), df = 2))
+sim_lm <- lm(y ~ x, data = sim1a)
+tidy(sim_lm)
+glance(sim_lm)
+
+sim1a1 <- tibble(x = rep(1:10, each = 3),y = x * 1.5 + 6 + rt(length(x), df = 2))
+sim_lm1 <- lm(y ~ x, data = sim1a1)
+sim1a2 <- tibble(x = rep(1:10, each = 3),y = x * 1.5 + 6 + rt(length(x), df = 2))
+sim_lm2 <- lm(y ~ x, data = sim1a2)
+sim1a3 <- tibble(x = rep(1:10, each = 3),y = x * 1.5 + 6 + rt(length(x), df = 2))
+sim_lm3 <- lm(y ~ x, data = sim1a3)
+sim1a4 <- tibble(x = rep(1:10, each = 3),y = x * 1.5 + 6 + rt(length(x), df = 2))
+sim_lm4 <- lm(y ~ x, data = sim1a4)
+sim1a5 <- tibble(x = rep(1:10, each = 3),y = x * 1.5 + 6 + rt(length(x), df = 2))
+sim_lm5 <- lm(y ~ x, data = sim1a5)
+
+tidy(sim_lm1)
+glance(sim_lm1)
+tidy(sim_lm2)
+glance(sim_lm2)
+tidy(sim_lm3)
+glance(sim_lm3)
+tidy(sim_lm4)
+glance(sim_lm4)
+tidy(sim_lm5)
+glance(sim_lm5)
+
 ```
 
