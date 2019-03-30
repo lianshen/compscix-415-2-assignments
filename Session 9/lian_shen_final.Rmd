@@ -124,7 +124,6 @@ mean_samp_sds <- mean(samp_sds)
 mean_samp_sds/samp_size
 ```
 
-
 ***
 
 ##**Exercise 2 - Linear Regression (5 points)**  
@@ -165,6 +164,25 @@ Based on the r-squared value for linear fit, homework 7's features were better f
 ##**Exercise 3 - AB Testing (5 points)**  
 **Download the ab_test_data.csv file from Canvas. This file contains two columns: version and conversion. Each row is a visitor to a webpage. The version column tells us which version of the webpage the visitor saw, and the conversion column is a binary value and equals 1 if the visitor converted (0 otherwise).**  
 **We want to perform an AB test on this data to see if the conversion rates are different for the two versions of the webpage.**  
+```{r}
+filepath <- "C:\\Users\\lshen\\Documents\\Data Science\\ab_test_data.csv"
+ab_data <- read_csv(file = filepath)
+```
+
 **Answer these questions:**  
 **a. What proportion of visitors converted for each version of the webpage?**  
+```{r}
+ab_data %>% group_by(version) %>% summarize(proportion = mean(conversion))
+```
+
 **b. Perform the AB test in R. What is the p-value for the AB test (hypothesis test of proportions)?**  
+```{r}
+samp_a <- 0.0415
+samp_b <- 0.1
+ab_data %>% group_by(version) %>% summarize(n())
+two_prop_test <- prop.test(c(samp_a, samp_b), c(2000, 2000))
+two_prop_test$p.value
+```
+The p-value is 1, so the conversion rates for Version A and B are not significantly different than each other
+
+***
