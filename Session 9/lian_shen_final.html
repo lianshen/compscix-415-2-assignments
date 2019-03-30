@@ -191,6 +191,13 @@ $(document).ready(function () {
 
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#exercise-1---sampling-distributions-functions-and-for-loops-10-points"><strong>Exercise 1 - Sampling Distributions, Functions and For Loops (10 points)</strong></a></li>
+<li><a href="#exercise-2---linear-regression-5-points"><strong>Exercise 2 - Linear Regression (5 points)</strong></a></li>
+<li><a href="#exercise-3---ab-testing-5-points"><strong>Exercise 3 - AB Testing (5 points)</strong></a></li>
+</ul>
+</div>
 
 <style type="text/css">
 pre code, pre, code {
@@ -204,6 +211,87 @@ pre code, pre, code {
 <p>Load libraries</p>
 <pre class="r"><code>library(tidyverse)
 library(broom)</code></pre>
+<hr />
+<div id="exercise-1---sampling-distributions-functions-and-for-loops-10-points" class="section level2">
+<h2><strong>Exercise 1 - Sampling Distributions, Functions and For Loops (10 points)</strong></h2>
+<p><strong>Recall that the distribution of the sample mean is approximately a Normal distribution, and that the standard error is p/sqrt(n). This holds true regardless of the distribution of our population.</strong><br />
+<strong>For this problem, assume that the number of miles that a particular car can run before its battery wears out is exponentially distributed with an average of 10,000 miles.</strong><br />
+<strong>The exponential distribution has a rate parameter that controls how quickly the distribution decays and defines what the mean and standard deviation will be. In our case the rate = 1/10000, the mean = 10000 and the standard deviation = 10000.</strong><br />
+<strong>You can sample from this exponential distribution in R using this code:</strong></p>
+<pre class="r"><code># sample size
+samp_size &lt;- 100
+# set the rate parameter
+samp_rate &lt;- 1/10000
+# take sample
+rexp(n = samp_size, rate = samp_rate)</code></pre>
+<pre><code>##   [1]  3335.27734  2299.55954  7082.53800 10772.20228  9343.02472
+##   [6] 17529.77354 59044.82111   884.73485  6771.01620   160.61510
+##  [11]   345.52902  9834.74811  5919.59843   813.52329 16812.52620
+##  [16]  1388.17247  1901.44060 11391.91538  1558.45094 11006.90981
+##  [21]  2228.96643  1528.34634 10617.11346  2750.13291  3717.60773
+##  [26]   413.44620 20049.65452  2660.86435 12930.11918  1095.15139
+##  [31] 22648.84086  4840.25845 11048.22545  4474.64659  9305.78793
+##  [36]  3752.36839  1177.91855 14415.33313  4416.38562 10121.92610
+##  [41] 27723.61444 14823.87509 30906.61324  5358.96400    30.08062
+##  [46]  5981.48563 10410.57948  3684.27392   266.12419  1355.12308
+##  [51] 24960.93368 13268.44573  1699.47146  3150.61519  8705.73384
+##  [56] 13189.24116  4644.44146  9896.16646  2936.63496 22058.05013
+##  [61]  2032.64734   815.66812 16159.02122 20031.27355 23735.11823
+##  [66] 15575.64555 39020.47922  8886.96705  5412.02059  1671.46921
+##  [71] 31363.88831  1038.77332  1593.62735  3447.10334  1953.44445
+##  [76] 19160.53252  5527.09254  3932.02769 13962.02911  9542.10062
+##  [81]  7759.58347 61965.00405  4779.23511 12592.42704 30510.74058
+##  [86] 15262.25166  3494.24536  4327.48800  4023.63637   516.84359
+##  [91]  6807.94829   975.75974  3880.14437 25443.34656 15128.41584
+##  [96] 14304.99360 16385.94083   830.52103  9872.08733 19157.43185</code></pre>
+<p><strong>STEP 1</strong><br />
+<strong>Write an R function that does the following:</strong><br />
+<strong>• Takes a sample of size samp_size from this exponential distribution (samp_size is an input parameter for the function)</strong><br />
+<strong>• Calculates the mean of that sample</strong><br />
+<strong>• Calculates the standard deviation of that sample</strong><br />
+<strong>• Returns the calculated mean and standard deviation as a list</strong><br />
+<strong>Helper code</strong></p>
+<pre class="r"><code>samp_fun &lt;- function(samp_size, samp_rate) {
+#...your code here...
+
+stats &lt;- list(samp_avg = samp_avg, samp_std_dev = samp_std_dev)
+return(stats)
+}</code></pre>
+<p><strong>STEP 2</strong><br />
+<strong>Then write a loop that does this:</strong><br />
+<strong>• Runs the above function 1000 times, with samp_size = 50 and samp_rate = 1/10000</strong><br />
+<strong>• Saves all of the sample means in a vector called sample_means, and all of the sample standard deviations in a vector called sample_sds</strong><br />
+<strong>STEP 3</strong><br />
+<strong>Then</strong><br />
+<strong>• plot your sample means as a histogram</strong><br />
+<strong>• output the standard deviation of your sample means</strong><br />
+<strong>• calculate the theoretical standard error ( = 10000, n = sample size)</strong><br />
+<strong>• calculate the mean of the sample standard deviations and use this to calculate the empirical standard error</strong><br />
+<strong>STEP 4</strong><br />
+<strong>Repeat STEP 2 and STEP 3 using a sample size of 5000.</strong></p>
+<hr />
+</div>
+<div id="exercise-2---linear-regression-5-points" class="section level2">
+<h2><strong>Exercise 2 - Linear Regression (5 points)</strong></h2>
+<p><strong>For this exercise we will return to the House Prices prediction dataset that we used for HW 7. You should have already downloaded the train.csv dataset before, but if you didn’t you can download it from Canvas in this week’s module.</strong><br />
+<strong>Load the train.csv dataset into R and fit a regression model with:</strong><br />
+<strong>• y = SalePrice</strong><br />
+<strong>• Features: LotArea, OverallQual, and ExterQual</strong><br />
+<strong>Answer these questions:</strong><br />
+<strong>• Use the broom package to output the coefficients and the R-squared</strong><br />
+<strong>• Interpret the coefficient on LotArea</strong><br />
+<strong>• Interpret the coefficient on ExterQualGd</strong><br />
+<strong>• Compare this model to the model we fit in HW 7 with GrLivArea, OverallQual, Neighborhood. Which is the better fitting model?</strong></p>
+<hr />
+</div>
+<div id="exercise-3---ab-testing-5-points" class="section level2">
+<h2><strong>Exercise 3 - AB Testing (5 points)</strong></h2>
+<p><strong>Download the ab_test_data.csv file from Canvas. This file contains two columns: version and conversion. Each row is a visitor to a webpage. The version column tells us which version of the webpage the visitor saw, and the conversion column is a binary value and equals 1 if the visitor converted (0 otherwise).</strong><br />
+<strong>We want to perform an AB test on this data to see if the conversion rates are different for the two versions of the webpage.</strong><br />
+<strong>Answer these questions:</strong><br />
+<strong>a. What proportion of visitors converted for each version of the webpage?</strong><br />
+<strong>b. Perform the AB test in R. What is the p-value for the AB test (hypothesis test of proportions)?</strong></p>
+</div>
 
 
 
