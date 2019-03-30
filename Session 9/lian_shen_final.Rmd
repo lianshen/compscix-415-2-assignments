@@ -34,16 +34,6 @@ library(broom)
 **Recall that the distribution of the sample mean is approximately a Normal distribution, and that the standard error is p/sqrt(n). This holds true regardless of the distribution of our population.**  
 **For this problem, assume that the number of miles that a particular car can run before its battery wears out is exponentially distributed with an average of 10,000 miles.**  
 **The exponential distribution has a rate parameter that controls how quickly the distribution decays and defines what the mean and standard deviation will be. In our case the rate = 1/10000, the mean = 10000 and the standard deviation = 10000.**  
-**You can sample from this exponential distribution in R using this code:**  
-```{r}
-
-# sample size
-samp_size <- 100
-# set the rate parameter
-samp_rate <- 1/10000
-# take sample
-rexp(n = samp_size, rate = samp_rate)
-```
 
 **STEP 1**  
 **Write an R function that does the following:**  
@@ -55,10 +45,15 @@ rexp(n = samp_size, rate = samp_rate)
 ```{r}
 
 samp_fun <- function(samp_size, samp_rate) {
-#...your code here...
-
-stats <- list(samp_avg = samp_avg, samp_std_dev = samp_std_dev)
-return(stats)
+  #...your code here...
+  # take sample
+  samp <- rexp(n = samp_size, rate = samp_rate)
+  # calculate mean and standard deviation
+  samp_avg <- mean(samp)
+  samp_std_dev <- sd(samp)
+  
+  stats <- list(samp_avg = samp_avg, samp_std_dev = samp_std_dev)
+  return(stats)
 }
 ```
 
@@ -66,14 +61,69 @@ return(stats)
 **Then write a loop that does this:**  
 **• Runs the above function 1000 times, with samp_size = 50 and samp_rate = 1/10000**  
 **• Saves all of the sample means in a vector called sample_means, and all of the sample standard deviations in a vector called sample_sds**  
+```{r}
+
+n <- 10000
+samp_size <- 50
+samp_rate <- 1/10000
+samp_means <- rep(NA, n)
+samp_sds <- rep(NA, n)
+
+for (i in 1:n){
+  samp_stats <- samp_fun(samp_size, samp_rate)
+  samp_means[i] <- samp_stats$samp_avg
+  samp_sds[i] <- samp_stats$samp_std_dev
+}
+```
+
 **STEP 3**  
 **Then**  
 **• plot your sample means as a histogram**  
+```{r}
+samp_means_tibble <- tibble(samp_means)
+samp_means_tibble %>% ggplot() + geom_histogram(aes(x = samp_means))
+```
+
 **• output the standard deviation of your sample means**  
-**• calculate the theoretical standard error ( = 10000, n = sample size)**  
+```{r}
+sd(samp_means)
+```
+
+**• calculate the theoretical standard error (p = 10000, n = sample size)**  
+```{r}
+10000/samp_size
+```
+
 **• calculate the mean of the sample standard deviations and use this to calculate the empirical standard error**  
+```{r}
+mean_samp_sds <- mean(samp_sds)
+mean_samp_sds/samp_size
+```
+
 **STEP 4**  
 **Repeat STEP 2 and STEP 3 using a sample size of 5000.**  
+```{r}
+n <- 10000
+samp_size <- 5000
+samp_rate <- 1/10000
+samp_means <- rep(NA, n)
+samp_sds <- rep(NA, n)
+
+for (i in 1:n){
+  samp_stats <- samp_fun(samp_size, samp_rate)
+  samp_means[i] <- samp_stats$samp_avg
+  samp_sds[i] <- samp_stats$samp_std_dev
+}
+
+samp_means_tibble <- tibble(samp_means)
+samp_means_tibble %>% ggplot() + geom_histogram(aes(x = samp_means))
+
+sd(samp_means) 
+10000/samp_size
+mean_samp_sds <- mean(samp_sds)
+mean_samp_sds/samp_size
+```
+
 
 ***
 
@@ -82,11 +132,33 @@ return(stats)
 **Load the train.csv dataset into R and fit a regression model with:**  
 **• y = SalePrice**  
 **• Features: LotArea, OverallQual, and ExterQual**  
+```{r}
+filepath <- "C:\\Users\\lshen\\Documents\\Data Science\\train.csv"
+train_data <- read_csv(file = filepath)
+train_data_lm <- lm(SalePrice ~ LotArea + OverallQual + ExterQual, data = train_data)
+```
+
 **Answer these questions:**  
 **• Use the broom package to output the coefficients and the R-squared**  
+```{r}
+# coefficients
+tidy(train_data_lm) %>% select(term, estimate)
+# r-squared
+glance(train_data_lm) %>% select(r.squared, adj.r.squared)
+```
+
 **• Interpret the coefficient on LotArea**  
+For every increase in unit LotArea, there is increase on average of 1.453 unit in SalePrice.
+
 **• Interpret the coefficient on ExterQualGd**  
+Good quality exterior material is on average 71529.49 units less than Excellent quality in SalePrice.
+
 **• Compare this model to the model we fit in HW 7 with GrLivArea, OverallQual, Neighborhood. Which is the better fitting model?**  
+```{r}
+homework7_lm <- lm(formula = SalePrice ~ GrLivArea + OverallQual + Neighborhood, data = train_data)
+glance(homework7_lm)
+```
+Based on the r-squared value for linear fit, homework 7's features were better fitting.
 
 ***
 
