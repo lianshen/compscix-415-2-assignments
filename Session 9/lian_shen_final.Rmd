@@ -142,7 +142,7 @@ train_data_lm <- lm(SalePrice ~ LotArea + OverallQual + ExterQual, data = train_
 ```{r}
 # coefficients
 tidy(train_data_lm) %>% select(term, estimate)
-# r-squared
+# R-squared
 glance(train_data_lm) %>% select(r.squared, adj.r.squared)
 ```
 
@@ -157,7 +157,7 @@ Good quality exterior material is on average 71529.49 units less than Excellent 
 homework7_lm <- lm(formula = SalePrice ~ GrLivArea + OverallQual + Neighborhood, data = train_data)
 glance(homework7_lm)
 ```
-Based on the r-squared value for linear fit, homework 7's features were better fitting.
+Based on the R-squared value for linear fit, homework 7's features were better fitting since its R-squared value was higher.
 
 ***
 
@@ -174,15 +174,17 @@ ab_data <- read_csv(file = filepath)
 ```{r}
 ab_data %>% group_by(version) %>% summarize(proportion = mean(conversion))
 ```
+A proportion of 4.15% converted for version A and 10% converted for version B.  
 
 **b. Perform the AB test in R. What is the p-value for the AB test (hypothesis test of proportions)?**  
 ```{r}
 samp_a <- 0.0415
 samp_b <- 0.1
+# get sample size
 ab_data %>% group_by(version) %>% summarize(n())
 two_prop_test <- prop.test(c(samp_a, samp_b), c(2000, 2000))
 two_prop_test$p.value
 ```
-The p-value is 1, so the conversion rates for Version A and B are not significantly different than each other
+The p-value is 1 which is greater than alpha of 0.5, so the conversion rates for Version A and B are not significantly different than each other.
 
 ***
